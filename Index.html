@@ -739,15 +739,24 @@
         // ============================================================
         //  FIREBASE - COLOQUE SUAS CREDENCIAIS AQUI
         // ============================================================
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
-        };
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyACCXVaWGRKDrHzhLw7hb0jHlndaTMkTcI",
+  authDomain: "meta-tiago.firebaseapp.com",
+  databaseURL: "https://meta-tiago-default-rtdb.firebaseio.com",
+  projectId: "meta-tiago",
+  storageBucket: "meta-tiago.firebasestorage.app",
+  messagingSenderId: "236017153560",
+  appId: "1:236017153560:web:dc64297118081466b3f56d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
         // Inicializa o Firebase
         firebase.initializeApp(firebaseConfig);
