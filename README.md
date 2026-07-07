@@ -1,2 +1,1048 @@
 # Meta-tiago
 Uber meta Tiago 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meta Tiago</title>
+
+    <!-- ===== FIREBASE ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+    </script>
+
+    <style>
+        /* ===== TODO O SEU CSS AQUI ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #0f1117;
+            color: #e8edf5;
+            padding: 24px;
+            max-width: 820px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .text-small {
+            font-size: 13px;
+            color: #8ba0c4;
+        }
+        .text-muted {
+            color: #6a7f9e;
+        }
+        .text-center {
+            text-align: center;
+        }
+
+        .card {
+            background: #181e2b;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            border: 1px solid #252e3f;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-header h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8ba0c4;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .card-header .action {
+            font-size: 12px;
+            color: #5b8def;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-weight: 500;
+        }
+
+        .card-header .action:hover {
+            color: #7aa3ff;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .app-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f0f4fa;
+            letter-spacing: -0.3px;
+        }
+
+        .app-header h1 span {
+            font-weight: 400;
+            color: #6a7f9e;
+        }
+
+        .app-header .day-info {
+            text-align: right;
+        }
+
+        .app-header .day-info .day {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f0f4fa;
+        }
+
+        .app-header .day-info .date {
+            font-size: 13px;
+            color: #6a7f9e;
+        }
+
+        .frase {
+            font-size: 14px;
+            color: #8ba0c4;
+            padding: 6px 0 14px 0;
+            border-bottom: 1px solid #252e3f;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .meta-item {
+            background: #232b3d;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .meta-item .label {
+            font-size: 11px;
+            color: #6a7f9e;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .meta-item .value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 2px;
+            color: #f0f4fa;
+        }
+
+        .meta-item .value.primary {
+            color: #5b8def;
+        }
+        .meta-item .value.green {
+            color: #4ade80;
+        }
+        .meta-item .value.yellow {
+            color: #fbbf24;
+        }
+        .meta-item .value.red {
+            color: #f87171;
+        }
+
+        .progress-bar {
+            background: #252e3f;
+            height: 8px;
+            border-radius: 40px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #5b8def;
+            border-radius: 40px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.green {
+            background: #4ade80;
+        }
+
+        .progress-fill.yellow {
+            background: #fbbf24;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6a7f9e;
+            margin-top: 4px;
+        }
+
+        .resumo-linha {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #252e3f;
+        }
+
+        .resumo-linha:last-child {
+            border-bottom: none;
+        }
+
+        .resumo-linha .label {
+            color: #8ba0c4;
+        }
+
+        .resumo-linha .value {
+            font-weight: 600;
+        }
+
+        .resumo-linha .value.green {
+            color: #4ade80;
+        }
+        .resumo-linha .value.red {
+            color: #f87171;
+        }
+        .resumo-linha .value.yellow {
+            color: #fbbf24;
+        }
+
+        .previsao-box {
+            background: #232b3d;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 4px;
+        }
+
+        .previsao-box .main {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f0f4fa;
+        }
+
+        .previsao-box .main.green {
+            color: #4ade80;
+        }
+        .previsao-box .main.yellow {
+            color: #fbbf24;
+        }
+        .previsao-box .main.red {
+            color: #f87171;
+        }
+
+        .previsao-box .detail {
+            font-size: 13px;
+            color: #8ba0c4;
+            margin-top: 2px;
+        }
+
+        .form-group {
+            margin-top: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #8ba0c4;
+            margin-bottom: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #252e3f;
+            background: #0f1117;
+            color: #f0f4fa;
+            font-size: 18px;
+            font-weight: 500;
+            outline: none;
+            transition: 0.15s ease;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            border-color: #5b8def;
+            box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: #4a5a72;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .form-control[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.7);
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s ease;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #5b8def;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #4a7ad4;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #8ba0c4;
+            border: 1px solid #252e3f;
+        }
+
+        .btn-outline:hover {
+            background: #232b3d;
+        }
+
+        .btn-danger {
+            background: #f87171;
+            color: #0f1117;
+        }
+
+        .btn-danger:hover {
+            background: #ef4444;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            flex: 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .status-badge.registered {
+            background: #064e3b;
+            color: #4ade80;
+        }
+
+        .status-badge.empty {
+            background: #450a0a;
+            color: #f87171;
+        }
+
+        .status-badge.bonus {
+            background: #451a03;
+            color: #fbbf24;
+        }
+
+        .historico-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .historico-nav .btn-nav {
+            background: none;
+            border: none;
+            color: #6a7f9e;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 8px;
+            transition: 0.1s ease;
+            font-weight: 300;
+        }
+
+        .historico-nav .btn-nav:hover {
+            background: #232b3d;
+            color: #f0f4fa;
+        }
+
+        .historico-nav .semana-info {
+            font-size: 13px;
+            color: #8ba0c4;
+            font-weight: 500;
+        }
+
+        .historico-dia {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #252e3f;
+        }
+
+        .historico-dia:last-child {
+            border-bottom: none;
+        }
+
+        .historico-dia .total {
+            font-weight: 500;
+        }
+
+        .historico-dia .total.green {
+            color: #4ade80;
+        }
+        .historico-dia .total.red {
+            color: #f87171;
+        }
+        .historico-dia .total.yellow {
+            color: #fbbf24;
+        }
+
+        .historico-dia .lucro {
+            color: #6a7f9e;
+        }
+
+        .historico-dia.domingo {
+            border-top: 1px solid #fbbf24;
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        .historico-dia.domingo .total {
+            color: #fbbf24;
+        }
+
+        .historico-dia.domingo.ajudou {
+            border-top-color: #4ade80;
+            background: #064e3b;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 6px;
+        }
+
+        .historico-dia.domingo.ajudou .total {
+            color: #4ade80;
+        }
+
+        .alerta-domingo {
+            background: #451a03;
+            border-radius: 8px;
+            padding: 10px 14px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fbbf24;
+            margin-top: 8px;
+            border: 1px solid #fbbf24;
+        }
+
+        .alerta-domingo.verde {
+            background: #064e3b;
+            color: #4ade80;
+            border-color: #4ade80;
+        }
+
+        .alerta-domingo.vermelho {
+            background: #450a0a;
+            color: #f87171;
+            border-color: #f87171;
+        }
+
+        .comparativo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .comparativo-item {
+            background: #232b3d;
+            border-radius: 12px;
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #252e3f;
+        }
+
+        .comparativo-item .semana-label {
+            font-size: 11px;
+            color: #6a7f9e;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .comparativo-item .valor-grande {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f0f4fa;
+            margin-top: 2px;
+        }
+
+        .comparativo-item .valor-grande.green {
+            color: #4ade80;
+        }
+
+        .comparativo-item .valor-grande.red {
+            color: #f87171;
+        }
+
+        .comparativo-item .valor-grande.yellow {
+            color: #fbbf24;
+        }
+
+        .comparativo-item .detalhe {
+            font-size: 11px;
+            color: #6a7f9e;
+            margin-top: 2px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .grid-2 .card {
+            margin-bottom: 0;
+        }
+
+        .grid-1 {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+            .card {
+                padding: 16px;
+            }
+            .meta-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .meta-item .value {
+                font-size: 17px;
+            }
+            .app-header h1 {
+                font-size: 18px;
+            }
+            .comparativo-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group .btn {
+                flex: 1;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .grid-2 .card {
+                margin-bottom: 16px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: #4a5a72;
+            font-size: 12px;
+            padding: 20px 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <div>
+            <h1>Meta <span>Tiago</span></h1>
+        </div>
+        <div class="day-info">
+            <div class="day" id="diaSemana">Segunda</div>
+            <div class="date" id="dataAtual">06/07/2026</div>
+        </div>
+    </div>
+
+    <div class="frase" id="fraseTexto">💪 Hoje é dia de buscar o seu melhor.</div>
+
+    <!-- ===== META ===== -->
+    <div class="card grid-1">
+        <div class="card-header">
+            <h3>Meta da Semana</h3>
+            <span class="text-small" id="metaTotalLabel">R$ 2.500</span>
+        </div>
+
+        <div class="meta-grid">
+            <div class="meta-item">
+                <div class="label">Meta / dia</div>
+                <div class="value primary" id="metaDiaria">R$ 416,67</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">Faturamento</div>
+                <div class="value green" id="totalFaturamento">R$ 0,00</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">Status</div>
+                <div class="value yellow" id="statusSemana">⏳ Em andamento</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressoSemana" style="width:0%;"></div>
+        </div>
+        <div class="progress-label">
+            <span>0%</span>
+            <span id="porcentagemSemana">0%</span>
+            <span>100%</span>
+        </div>
+
+        <div class="resumo-linha mt-8">
+            <span class="label">Recargas</span>
+            <span class="value" id="totalRecargas">R$ 0,00</span>
+        </div>
+        <div class="resumo-linha">
+            <span class="label">Lucro líquido</span>
+            <span class="value green" id="lucroSemana">R$ 0,00</span>
+        </div>
+
+        <div id="alertaDomingo" class="hidden alerta-domingo"></div>
+    </div>
+
+    <!-- ===== PREVISÃO ===== -->
+    <div class="card grid-1">
+        <div class="card-header">
+            <h3>Previsão</h3>
+        </div>
+        <div class="previsao-box">
+            <div class="main" id="previsaoTexto">Registre o dia</div>
+            <div class="detail" id="previsaoDetalhe">Adicione o faturamento e recargas do dia</div>
+        </div>
+    </div>
+
+    <!-- ===== REGISTRAR / EVOLUÇÃO (GRID 2 COLUNAS) ===== -->
+    <div class="grid-2">
+
+        <!-- REGISTRAR -->
+        <div class="card" style="border:1px solid #5b8def;">
+            <div class="card-header">
+                <h3>Registrar / Editar</h3>
+                <span class="status-badge empty" id="statusBadge">⏳ Pendente</span>
+            </div>
+
+            <div class="form-group">
+                <label>📅 Data</label>
+                <input type="date" class="form-control" id="dataDia">
+            </div>
+
+            <div class="form-group">
+                <label>💰 Faturamento</label>
+                <input type="number" class="form-control" id="faturamentoDia" placeholder="R$ 0,00" step="0.01">
+            </div>
+
+            <div class="form-group">
+                <label>⚡ Recargas</label>
+                <input type="number" class="form-control" id="recargaDia" placeholder="R$ 0,00" step="0.01">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btnSalvarDia">Salvar</button>
+                <button class="btn btn-outline" id="btnLimparDia">Limpar</button>
+            </div>
+
+            <div id="resumoHoje" class="hidden" style="margin-top:12px;padding-top:12px;border-top:1px solid #252e3f;">
+                <div class="resumo-linha">
+                    <span class="label">Faturamento</span>
+                    <span class="value" id="resumoFat">R$ 0,00</span>
+                </div>
+                <div class="resumo-linha">
+                    <span class="label">Recargas</span>
+                    <span class="value" id="resumoRec">R$ 0,00</span>
+                </div>
+                <div class="resumo-linha">
+                    <span class="label">Lucro</span>
+                    <span class="value green" id="resumoLucro">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVOLUÇÃO SEMANAL -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Evolução Semanal</h3>
+            </div>
+            <div id="comparativoContainer">
+                <div class="text-small text-center" style="padding:12px 0;">Carregando...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== HISTÓRICO DA SEMANA ===== -->
+    <div class="card grid-1">
+        <div class="card-header">
+            <h3>Histórico da Semana</h3>
+            <button class="action" id="btnResetarSemana">Resetar</button>
+        </div>
+
+        <div class="historico-nav">
+            <button class="btn-nav" id="btnSemanaAnterior">‹</button>
+            <span class="semana-info" id="semanaInfo">Semana Atual</span>
+            <button class="btn-nav" id="btnSemanaProxima">›</button>
+        </div>
+
+        <div id="historicoSemana">
+            <div class="text-small text-center" style="padding:12px 0;">Carregando...</div>
+        </div>
+    </div>
+
+    <div class="footer">Dados salvos automaticamente</div>
+
+    <script>
+        // ============================================================
+        //  CONFIGURAÇÕES
+        // ============================================================
+        const META_SEMANAL = 2500;
+        const DIAS_TRABALHO = 6;
+        const META_DIARIA_PADRAO = META_SEMANAL / DIAS_TRABALHO;
+
+        // ============================================================
+        //  FIREBASE - COLOQUE SUAS CREDENCIAIS AQUI
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ============================================================
+        //  ESTADO
+        // ============================================================
+        let dias = {};
+        let semanaOffset = 0;
+        let dadosCarregados = false;
+
+        // ============================================================
+        //  DOM
+        // ============================================================
+        const $ = id => document.getElementById(id);
+
+        // ============================================================
+        //  AUX
+        // ============================================================
+        function hoje() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getDiaSemana() {
+            return ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][new Date().getDay()];
+        }
+
+        function getDiaSemanaNumero() {
+            return new Date().getDay();
+        }
+
+        function isDomingo() {
+            return getDiaSemanaNumero() === 0;
+        }
+
+        function formatarDataBr(dt) {
+            const d = new Date(dt + 'T00:00:00');
+            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        }
+
+        function formatarMoeda(val) {
+            return 'R$ ' + val.toFixed(2).replace('.', ',');
+        }
+
+        function getDiaDaSemana(dt) {
+            return ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][new Date(dt + 'T00:00:00')
+            .getDay()];
+        }
+
+        function calcularMetaDia() {
+            return isDomingo() ? 0 : META_DIARIA_PADRAO;
+        }
+
+        function getSegundaFeira(data) {
+            const d = new Date(data);
+            d.setHours(0, 0, 0, 0);
+            const dia = d.getDay();
+            const diff = dia === 0 ? 6 : dia - 1;
+            d.setDate(d.getDate() - diff);
+            return d;
+        }
+
+        // ============================================================
+        //  FIREBASE - LEITURA E ESCRITA
+        // ============================================================
+        function salvarDadosFirebase() {
+            if (!dadosCarregados) return;
+            database.ref('dias').set(dias).catch(err => {
+                console.error('Erro ao salvar:', err);
+                alert('Erro ao salvar os dados. Verifique sua internet.');
+            });
+        }
+
+        function carregarDadosFirebase() {
+            database.ref('dias').on('value', (snapshot) => {
+                const dados = snapshot.val();
+                if (dados) {
+                    dias = dados;
+                } else {
+                    dias = {};
+                }
+                dadosCarregados = true;
+                atualizarTudo();
+            }, (error) => {
+                console.error('Erro ao carregar:', error);
+                alert('Erro ao carregar os dados. Verifique sua internet.');
+            });
+        }
+
+        // ============================================================
+        //  CALCULAR TOTAIS DA SEMANA
+        // ============================================================
+        function calcularTotaisSemana(dataRef) {
+            const segunda = getSegundaFeira(dataRef);
+            const diasSemana = [];
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(segunda);
+                d.setDate(segunda.getDate() + i);
+                const key = d.toISOString().split('T')[0];
+                const reg = dias[key];
+                const fat = reg ? reg.faturamento || 0 : 0;
+                const rec = reg ? reg.recarga || 0 : 0;
+                const isDomingo = i === 6;
+                diasSemana.push({ key, fat, rec, isDomingo, reg });
+            }
+
+            let totalFatSegSab = 0;
+            let totalRecSegSab = 0;
+            let diasComRegistro = 0;
+
+            for (let i = 0; i < 6; i++) {
+                const d = diasSemana[i];
+                totalFatSegSab += d.fat;
+                totalRecSegSab += d.rec;
+                if (d.reg) diasComRegistro++;
+            }
+
+            const metaBatidaAteSabado = totalFatSegSab >= META_SEMANAL;
+
+            let domingoEntra = false;
+            let totalFat = totalFatSegSab;
+            let totalRec = totalRecSegSab;
+            let domingoFat = 0;
+            let domingoRec = 0;
+
+            if (diasSemana[6].reg) {
+                domingoFat = diasSemana[6].fat;
+                domingoRec = diasSemana[6].rec;
+                if (!metaBatidaAteSabado) {
+                    totalFat += domingoFat;
+                    totalRec += domingoRec;
+                    domingoEntra = true;
+                }
+            }
+
+            const lucro = totalFat - totalRec;
+            const falta = Math.max(0, META_SEMANAL - totalFat);
+            const metaAlcancada = totalFat >= META_SEMANAL;
+            const progresso = Math.min(100, (totalFat / META_SEMANAL) * 100);
+
+            let status = '';
+            let statusCor = '';
+
+            if (metaAlcancada) {
+                if (metaBatidaAteSabado) {
+                    status = '✅ Meta Alcançada!';
+                    statusCor = 'green';
+                } else {
+                    status = '✅ Meta com Domingo! 💪';
+                    statusCor = 'green';
+                }
+            } else {
+                status = `⏳ Faltam ${formatarMoeda(falta)}`;
+                statusCor = 'yellow';
+            }
+
+            return {
+                totalFat,
+                totalRec,
+                lucro,
+                falta,
+                metaAlcancada,
+                metaBatidaAteSabado,
+                progresso,
+                status,
+                statusCor,
+                domingoEntra,
+                domingoFat,
+                domingoRec,
+                diasSemana,
+                totalFatSegSab,
+                totalRecSegSab,
+                diasComRegistro
+            };
+        }
+
+        // ============================================================
+        //  RENDER: COMPARATIVO
+        // ============================================================
+        function renderizarComparativo() {
+            const container = $('comparativoContainer');
+            const hojeDate = new Date();
+            const segunda = getSegundaFeira(hojeDate);
+
+            let semanas = [];
+            for (let s = 0; s < 4; s++) {
+                const inicio = new Date(segunda);
+                inicio.setDate(segunda.getDate() - s * 7);
+                const dados = calcularTotaisSemana(inicio);
+                const label = `Sem ${s+1}`;
+                semanas.push({ label, ...dados });
+            }
+
+            let html = '<div class="comparativo-grid">';
+            semanas.forEach((sem, idx) => {
+                const cor = sem.metaAlcancada ? 'green' : (sem.totalFat > 0 ? 'yellow' : 'red');
+                const displayFat = sem.totalFat > 0 ? formatarMoeda(sem.totalFat) : '--';
+                html += `
+                    <div class="comparativo-item">
+                        <div class="semana-label">${sem.label}</div>
+                        <div class="valor-grande ${cor}">${formatarMoeda(sem.lucro)}</div>
+                        <div class="detalhe">${displayFat} · ${sem.diasComRegistro} dias</div>
+                        ${sem.domingoEntra ? '<div class="detalhe" style="color:#4ade80;">🌞 Domingo ajudou!</div>' : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        //  RENDER: HISTÓRICO DA SEMANA
+        // ============================================================
+        function renderizarHistoricoSemana() {
+            const container = $('historicoSemana');
+            const hojeDate = new Date();
+            const segundaAtual = getSegundaFeira(hojeDate);
+
+            const segunda = new Date(segundaAtual);
+            segunda.setDate(segundaAtual.getDate() + semanaOffset * 7);
+
+            const dados = calcularTotaisSemana(segunda);
+
+            const inicioStr = formatarDataBr(segunda.toISOString().split('T')[0]);
+            const fim = new Date(segunda);
+            fim.setDate(segunda.getDate() + 6);
+            const fimStr = formatarDataBr(fim.toISOString().split('T')[0]);
+
+            const semanaInfo = $('semanaInfo');
+            const offsetAbs = Math.abs(semanaOffset);
+            if (semanaOffset === 0) {
+                semanaInfo.textContent = `Semana Atual (${inicioStr} - ${fimStr})`;
+            } else if (semanaOffset < 0) {
+                semanaInfo.textContent = `${offsetAbs} semana${offsetAbs > 1 ? 's' : ''} atrás (${inicioStr} - ${fimStr})`;
+            } else {
+                semanaInfo.textContent = `${offsetAbs} semana${offsetAbs > 1 ? 's' : ''} à frente (${inicioStr} - ${fimStr})`;
+            }
+
+            let html = '';
+            const diasSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(segunda);
+                d.setDate(segunda.getDate() + i);
+                const key = d.toISOString().split('T')[0];
+                const label = diasSemana[i];
+                const reg = dias[key];
+                const fat = reg ? reg.faturamento || 0 : 0;
+                const rec = reg ? reg.recarga || 0 : 0;
+                const lucro = fat - rec;
+
+                const isDomingo = i === 6;
+
+                let icone = '⬜';
+                let corLucro = '';
+
+                if (reg) {
+                    if (fat >= META_DIARIA_PADRAO) {
+                        icone = '✅';
+                        corLucro = 'green';
+                    } else if (isDomingo) {
+                        icone = '🌞';
+                        corLucro = 'yellow';
+                    } else {
+                        icone = '⏳';
+                        corLucro = 'yellow';
+                    }
+                }
+
+                const fatDisplay = reg ? formatarMoeda(fat) : '--';
+                const recDisplay = reg ? formatarMoeda(rec) : '';
+                const lucroDisplay = reg ? formatarMoeda(lucro) : '';
+
+                let classeExtra = '';
+                let labelExtra = '';
+
+                if (isDomingo) {
+                    if (dados.domingoEntra) {
+                        classeExtra = ' domingo ajudou';
+                        labelExtra = ' 💪 Ajudou!';
+                    } else if (reg && dados.metaBatidaAteSabado) {
+                        classeExtra = ' domingo';
+                        labelExtra = ' 🌟 Extra!';
+                    } else {
+                        classeExtra = ' domingo';
+                    }
+                }
+
+                if (isDomingo && dados.domingoEntra && reg) {
+                    corLucro = 'green';
+                }
+
+                html += `<div class="historico-dia${classeExtra}">
+                    <span>${icone} ${label} (${
